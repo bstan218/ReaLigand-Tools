@@ -1,0 +1,6 @@
+Metadata-Version: 2.4
+Name: rltools
+Version: 0.1.0
+Summary: Tools for working with the ReaLigands library
+Author-email: Britton Stanley <bstan218@gmail.com>
+Requires-Dist: rdkit
