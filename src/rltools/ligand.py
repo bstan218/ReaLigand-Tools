@@ -9,6 +9,11 @@ def test_function():
     print('This is a test function nice')
 
 
+class Bond:
+    pass
+
+class Atom:
+    pass
 
 class Denticity(Enum):
     Monodentate = 1
