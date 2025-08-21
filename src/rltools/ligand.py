@@ -17,11 +17,11 @@ class Coordinate:
         self.z = coordinates[2]
     
     def __hash__(self):
-        return (self.x, self.y, self.z)
+        return hash((self.x, self.y, self.z))
     
-    def __eq__(self, other):
-        if isinstance(other, Coordinate):
-            return self.x == other.x and self.y == other.y and self.z == other.z
+    def __eq__(self, value):
+        if isinstance(value, Coordinate):
+            return self.x == value.x and self.y == value.y and self.z == value.z
         return False
 
 
@@ -160,7 +160,7 @@ class Atom:
     def __init__(self):
         self.element:Element = None
         self.coordinate:Coordinate = None
-        self.bonds:list[Bond] = []
+        self.bonds:set[Bond] = set()
 
     def set_element(self, element:Element):
         if isinstance(element, Element):
@@ -175,10 +175,27 @@ class Atom:
             raise ValueError()
 
     def add_bond(self, bond:'Bond'):
-        if isinstance(bond, 'Bond'):
-            self.bonds.append(bond)
-        else:
+        if not isinstance(bond, 'Bond'):
             raise ValueError()
+        
+        if self not in bond.atoms:
+            raise ValueError()
+        
+        self.bonds.add(bond)
+        
+    def __hash__(self):
+        return hash((self.coordinate, self.element))
+    
+    def __eq__(self, value):
+        if not isinstance(value, Atom):
+            return False
+        if self.coordinate != value.coordinate:
+            return False
+        if self.bonds != value.bonds:
+            return False
+
+        return True
+        
     
     
     
@@ -192,6 +209,19 @@ class Bond:
     @property
     def atoms(self) -> tuple:
         return (self.atom1, self.atom2)
+    
+    def __hash__(self):
+        return hash((frozenset(self.atom1, self.atom2), self.multiplicity))
+    
+    def __eq__(self, value):
+        if not isinstance(value, Bond):
+            return False
+        
+        if frozenset(self.atoms) != frozenset(value.atoms):
+            return False
+
+        return True
+        
 
 
 
@@ -225,6 +255,12 @@ class Ligand(ABC):
     def set_coordinating_atoms(self, coordinating_atoms:list[Atom]):
         for atom in coordinating_atoms:
             if atom not in self.atoms:
+                raise ValueError('atom cannot be coordinating atom if not a part of the ligand')
+        
+        self.coordinating_atoms = coordinating_atoms
+
+    def __hash__(self):
+        return hash((frozenset(self.atoms)))
 
 
 
