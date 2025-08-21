@@ -4,16 +4,25 @@ from AaronTools.fileIO import FileReader
 from .pattern import Pattern
 from AaronTools.geometry import Geometry
 from enum import Enum, IntEnum
+from abc import ABC, abstractmethod
 
 def test_function():
     print('This is a test function nice')
 
 
-class Coordinates:
+class Coordinate:
     def __init__(self, coordinates:tuple):
         self.x = coordinates[0]
         self.y = coordinates[1]
         self.z = coordinates[2]
+    
+    def __hash__(self):
+        return (self.x, self.y, self.z)
+    
+    def __eq__(self, other):
+        if isinstance(other, Coordinate):
+            return self.x == other.x and self.y == other.y and self.z == other.z
+        return False
 
 
 class Element(IntEnum):
@@ -148,21 +157,31 @@ class Element(IntEnum):
     X   = -7     # Generic halogen
 
 class Atom:
-    def __init__(self, element:Element, bonds:list['Bond']=None, coordinates:Coordinates=None):
-        self.element:Element = element
+    def __init__(self):
+        self.element:Element = None
+        self.coordinate:Coordinate = None
+        self.bonds:list[Bond] = []
 
-        self.bonds:list['Bond'] = []
-        for bond in bonds:
-            if isinstance(bond, 'Bond'):
-                self.bonds.append(bond)
-            else:
-                raise ValueError
-        
-        self.coordinates:Coordinates = None
-        if isinstance(coordinates, Coordinates):
-            self.coodinates = coordinates
+    def set_element(self, element:Element):
+        if isinstance(element, Element):
+            self.element = element
         else:
             raise ValueError()
+
+    def set_coordinate(self, coordinate:Coordinate):
+        if isinstance(coordinate, Coordinate):
+            self.coordinate = Coordinate
+        else:
+            raise ValueError()
+
+    def add_bond(self, bond:'Bond'):
+        if isinstance(bond, 'Bond'):
+            self.bonds.append(bond)
+        else:
+            raise ValueError()
+    
+    
+    
 
 class Bond:
     def __init__(self, atom1, atom2, multiplicity:int=1):
@@ -182,14 +201,17 @@ class Denticity(IntEnum):
     Tridentate   = 3
     Tetradentate = 4
 
-class Ligand:
+class Ligand(ABC):
+    denticity:Denticity = None
+
     def __init__(self) -> None:
+        super.__init__()
         self.name = ""
         self.charge:int = None
-        self.denticity:Denticity = None
         self.atoms:list[Atom] = []
         self.bonds:list[Bond] = []
-              
+        self.coordinating_atoms:list[Atom] = []
+
 
     def set_name(self, name:str) -> None:
         self.name = name
@@ -200,6 +222,12 @@ class Ligand:
     def set_denticity(self, denticity:Denticity) -> None:
         self.denticity = denticity
     
+    def set_coordinating_atoms(self, coordinating_atoms:list[Atom]):
+        for atom in coordinating_atoms:
+            if atom not in self.atoms:
+
+
+
     def add_atom(self, atom:Atom) -> list[Atom]:
         self.atoms.append(atom)
         return self.atoms
@@ -207,21 +235,30 @@ class Ligand:
     def add_bond(self, bond:Bond) -> list[Bond]:
         self.bonds.append(bond)
         return self.bonds
-    
-
-    #Returns graph f
-    def get_graph(self):
-        pass
 
     def match_pattern(self, pattern:Pattern):
         matches = pattern.get_matches(self)
         return matches
+    
+class TridentateLigand(Ligand):
+    denticity = Denticity(3)
+    
+    def __init__(self):
+        super().__init__()
+
+    @property
+    def side_connections(self) -> tuple[Atom]:
+        pass
+        #logic comparing atom distances
+    
+    
 
 
-class LigandParser:
+class LigandParser(ABC):
     
     def __init__(self) -> None:
         self._parsed_ligands:dict[] = {}
+        self._filepaths:dict[str] = {}
 
 
     #Parse either an sdf or mol file
@@ -234,6 +271,7 @@ class LigandParser:
         return self._parsed_ligands[key]
 
     
+
 
 if __name__ == "__main__":
     ligand = Ligand()
