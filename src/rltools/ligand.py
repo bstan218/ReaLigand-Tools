@@ -183,18 +183,35 @@ class Denticity(IntEnum):
     Tetradentate = 4
 
 class Ligand:
-    def __init__(self, filepath:str) -> None:
+    def __init__(self) -> None:
+        self.name = ""
         self.charge:int = None
         self.denticity:Denticity = None
-        self.atoms:list[Atom] = None
-        self.bonds:list[Bond] = None
-        
-        
-        filereader = FileReader(filepath)
-        
-        self.rdkit_mol:Mol = Chem.MolFromMolFile(filepath, removeHs=False)
-        output = filereader.read_file(get_all=True)
-        print(output)
+        self.atoms:list[Atom] = []
+        self.bonds:list[Bond] = []
+              
+
+    def set_name(self, name:str) -> None:
+        self.name = name
+    
+    def set_charge(self, charge:int) -> None:
+        self.charge = charge
+    
+    def set_denticity(self, denticity:Denticity) -> None:
+        self.denticity = denticity
+    
+    def add_atom(self, atom:Atom) -> list[Atom]:
+        self.atoms.append(atom)
+        return self.atoms
+
+    def add_bond(self, bond:Bond) -> list[Bond]:
+        self.bonds.append(bond)
+        return self.bonds
+    
+
+    #Returns graph f
+    def get_graph(self):
+        pass
 
     def match_pattern(self, pattern:Pattern):
         matches = pattern.get_matches(self)
@@ -202,14 +219,21 @@ class Ligand:
 
 
 class LigandParser:
+    
     def __init__(self) -> None:
-        pass
+        self._parsed_ligands:dict[] = {}
 
+
+    #Parse either an sdf or mol file
+    #Cannot just use aarontools parser since doesn't parse comment lines. But can rip code
     def parse(self, filepath:str) -> Ligand:
-        rdkit_mol = Chem.MolFromMolFile(filepath, removeHs=False)
-        aaron_filereader = FileReader(filepath)
-        aaron_geom = aaron_filereader.read_file()
-        ligand = Ligand()
+        with open(filepath, 'r') as inf:
+            lines = inf.readlines()
+
+    def __getitem__(self, key):
+        return self._parsed_ligands[key]
+
+    
 
 if __name__ == "__main__":
     ligand = Ligand()
