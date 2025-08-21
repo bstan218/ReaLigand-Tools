@@ -12,3 +12,28 @@ class Pattern(ABC):
     @abstractclassmethod
     def get_matches(cls, ligand:Ligand) -> Substructure:
         pass
+
+
+
+class Cycle(Pattern):
+    def get_matches(cls, ligand:Ligand) -> Substructure:
+        pass
+
+class Aromatic(Pattern):
+    
+
+class Bridge(Pattern):
+    pass
+
+
+class RGroup(Pattern):
+    pass
+
+class ExtendedRGroup(Pattern):
+    pass
+
+class ArylExtendedRGroup(Pattern):
+    pass
+
+class AlkylExtendedRGroup(Pattern):
+    pass
