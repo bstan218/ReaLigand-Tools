@@ -1,5 +1,9 @@
-from .ligand import Ligand
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from abc import ABC, abstractclassmethod
+
+if TYPE_CHECKING:
+    from .ligand import Ligand
 
 class Substructure:
     def __init__(self) -> None:
@@ -20,7 +24,7 @@ class Cycle(Pattern):
         pass
 
 class Aromatic(Pattern):
-    
+    pass
 
 class Bridge(Pattern):
     pass
