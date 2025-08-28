@@ -34,12 +34,13 @@ class LigandParser(ABC):
         for i, line in enumerate(lines):
             if i == 0:
                 header = line.strip()
-                coordinating_atom_indexes = tuple(header.split(','))
+                coordinating_atom_indexes = tuple([int(e) for e in header.split(',')])
                 denticity = len(coordinating_atom_indexes)
 
-            if i == 2:
+            if i == 1:
                 comment = line.strip()
-                charge = int(comment.split()[:1])
+                print(comment)
+                charge = int(float(comment.split()[2].strip(', ')))
 
             if i == 3:
                 natoms = int(line[0:3])
@@ -50,9 +51,9 @@ class LigandParser(ABC):
                 atom_index = 1
                 for line in lines[i : i + natoms]:
                     
-                    x_coord          = int(line[0:10].strip())
-                    y_coord          = int(line[10:20].strip())
-                    z_coord          = int(line[20:30].strip())
+                    x_coord          = float(line[0:10].strip())
+                    y_coord          = float(line[10:20].strip())
+                    z_coord          = float(line[20:30].strip())
                     element_str      =     line[30:34].strip()
                     mass_diff        = int(line[34:36].strip())
                     charge_code      = int(line[36:39].strip())

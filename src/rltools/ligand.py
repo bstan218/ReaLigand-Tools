@@ -180,7 +180,7 @@ class Atom:
         self.formal_charge = charge
 
     def add_bond(self, bond:'Bond'):
-        if not isinstance(bond, 'Bond'):
+        if not isinstance(bond, Bond):
             raise ValueError()
         
         if self not in bond.atoms:
@@ -205,8 +205,10 @@ class Atom:
             return False
         if self.coordinate != value.coordinate:
             return False
-        if self.bonds != value.bonds:
-            return False
+        
+        # Including this results in infinite recursion
+        # if self.bonds != value.bonds:
+        #     return False
 
         return True
         
@@ -221,7 +223,7 @@ class Bond:
         self.multiplicity:int = multiplicity
     
     def __hash__(self):
-        return hash((frozenset(self.atom1, self.atom2), self.multiplicity))
+        return hash((frozenset((self.atom1, self.atom2)), self.multiplicity))
     
     def __eq__(self, value):
         if not isinstance(value, Bond):
@@ -254,7 +256,7 @@ class Ligand(ABC):
     denticity:Denticity = None
 
     def __init__(self) -> None:
-        super.__init__()
+        super().__init__()
         self.name = ""
         self.charge:int = None
         self.atoms:list[Atom] = []
